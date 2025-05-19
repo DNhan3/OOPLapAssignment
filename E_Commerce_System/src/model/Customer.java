@@ -12,7 +12,12 @@ public class Customer extends User {
         this.userMobile = userMobile;
     }
 
-    public Customer() {
+    public Customer(String userId, String userName, String userPassword,
+                    String userRegisterTime, String userEmail, String userMobile) {
+        this(userId, userName, userPassword, userRegisterTime, "customer", userEmail, userMobile);
+    }
+
+    public Customer(String string, String newUsername, String newPassword, String newEmail, String newMobile) {
         super();
         this.userEmail = "default@example.com";
         this.userMobile = "0412345678";
@@ -28,5 +33,21 @@ public class Customer extends User {
                "\", \"user_email\":\""          + userEmail +
                "\", \"user_mobile\":\""         + userMobile +
                 "\"}";
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserMobile() {
+        return userMobile;
+    }
+
+    public void setUserMobile(String userMobile) {
+        this.userMobile = userMobile;
     }
 }
