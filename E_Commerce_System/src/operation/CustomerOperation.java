@@ -30,8 +30,15 @@ public class CustomerOperation {
         return mobile != null && mobile.matches("^(04|03)\\d{8}$");
     }
 
-    public boolean registerCustomer(String userName, String userPassword,
-                                     String userEmail, String userMobile) {
+    public boolean registerCustomer(Customer customer_) {
+        if (customer_ == null) return false;
+        String userName = customer_.getUserName();
+        String userPassword = customer_.getUserPassword();
+        String userEmail = customer_.getUserEmail();
+        String userMobile = customer_.getUserMobile();
+        if (userName == null || userPassword == null || userEmail == null || userMobile == null) {
+            return false;
+        }
         UserOperation userOp = UserOperation.getInstance();
 
         if (!userOp.validateUsername(userName) ||
@@ -119,38 +126,6 @@ public class CustomerOperation {
             return false;
         }
     }
-
-    public CustomerListResult getCustomerList(int pageNumber) {
-        List<Customer> customers = new ArrayList<>();
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(FILE_PATH));
-            for (String line : lines) {
-                if (line.contains("\"user_role\":\"customer\"")) {
-                    customers.add((Customer) ReadUserDB.parseUserFromJson(line));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Failed to read customers: " + e.getMessage());
-        }
-
-        int totalPages = (int) Math.ceil(customers.size() / 10.0);
-        int start = (pageNumber - 1) * 10;
-        int end = Math.min(start + 10, customers.size());
-        List<Customer> page = start < customers.size() ? customers.subList(start, end) : new ArrayList<>();
-
-        return new CustomerListResult(page, pageNumber, totalPages);
-    }
-
-    public void deleteAllCustomers() {
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(FILE_PATH));
-            lines.removeIf(line -> line.contains("\"user_role\":\"customer\""));
-            Files.write(Paths.get(FILE_PATH), lines);
-        } catch (IOException e) {
-            System.out.println("Failed to delete all customers: " + e.getMessage());
-        }
-    }
-
 
    
 }

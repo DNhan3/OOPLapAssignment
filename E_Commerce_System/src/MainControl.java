@@ -1,7 +1,6 @@
 import java.util.Scanner;
 
 import model.Customer;
-import model.Order;
 import model.Product;
 import model.User;
 import operation.CustomerOperation;
@@ -11,12 +10,8 @@ import operation.UserOperation;
 
 public class MainControl {
     public static void main(String[] args) {
-        IOInterface.printMenu();
-        
         Scanner scanner = new Scanner(System.in);
-        int choice = scanner.nextInt();
-
-        switch (choice) {
+        switch(IOInterface.printMenu(scanner)){
             case 1:
                 login(scanner);
                 break;
@@ -24,10 +19,10 @@ public class MainControl {
                 register(scanner);
                 break;
             case 3:
-                System.out.println("Quiting...");
+                IOInterface.exit();
                 break;
             default:
-                System.out.println("Invalid choice. Please try again.");
+                break;
         }
 
         scanner.close();
@@ -40,97 +35,78 @@ public class MainControl {
         String password = scanner.next();
         User user = userOp.login(username, password);
         if (user != null && user.getUserRole().equals("customer")) {
-            IOInterface.printCustomerMenu(user.getUserName());
-            scanner.nextLine(); // Consume newline
+            
             ProductOperation productOp = ProductOperation.getInstance();
             OrderOperation orderOp = OrderOperation.getInstance();
             CustomerOperation cusOp = CustomerOperation.getInstance();
-            String choice = scanner.nextLine();
             String productId = null;
-            switch (choice) {
-                case "1":
+            switch (IOInterface.printCustomerMenu(user.getUserName(), scanner)) {
+                case 1:
                     int page = 1;
                     do {
-                        System.out.println("Total pages: " + productOp.getProductPage());
-                        System.out.println("Enter page number or 'q' to quit:");
-                        String input = scanner.nextLine();
+                        String input = IOInterface.printProductList1(scanner);
                         if (input.equals("q")) {
                             break;
                         }
                         try {
                             page = Integer.parseInt(input);
                             if (page < 1 || page > productOp.getProductPage()) {
-                                System.out.println("Invalid page number. Please try again.");
+                                IOInterface.printError("Invalid page number. Please try again.");
                             } else {
                                 productOp.getProductList(page).display();
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Invalid input. Please enter a number.");
+                            IOInterface.printError("Invalid input. Please enter a number.");
                         }
                     } while (true);
                     break;
-                case "2":
+                case 2:
                     productOp = ProductOperation.getInstance();
-                    System.out.println("Enter product ID to search:");
-                    productId = scanner.nextLine();
+                    productId = IOInterface.getProductId(scanner);
                     Product product = productOp.getProductById(productId);
                     if (product != null) {
-                        System.out.println("Product found: " + product);
+                        IOInterface.print("Product found: " + product);
                     } else {
-                        System.out.println("Product not found.");
+                        IOInterface.printError("Product not found.");
                     }
                     break;
-                case "3":
-                    System.out.println("Enter product ID to place order:");
-                    productId = scanner.nextLine();
+                case 3:
+                    productId = IOInterface.getProductId(scanner);
                     if(orderOp.placeOrder(user.getUserId(), productId)){
-                        System.out.println("Place order successfully.");
+                        IOInterface.successful();
                     }
                     else{
-                        System.out.println("Place order failed.");
+                        IOInterface.failed();
                     }
                     break;
-                case "4":
-                    System.out.println("Your orders:");
-                    int cnt = 0;
-                    for (Order order : orderOp.getOrdersByUserId(user.getUserId())) {
-                        System.out.println(++cnt + ". " + order);
-                    }
+                case 4:
+                    IOInterface.printOrders(orderOp.getOrdersByUserId(user.getUserId()));
                     break;
-                case "5":
-                    System.out.println("Enter new username:");
-                    String newUsername = scanner.nextLine();
-                    System.out.println("Enter new password:");
-                    String newPassword = scanner.nextLine();
-                    System.out.println("Enter new email:");
-                    String newEmail = scanner.nextLine();
-                    System.out.println("Enter new mobile:");
-                    String newMobile = scanner.nextLine();
-                    cusOp.updateProfile(new Customer( user.getUserId(), newUsername, UserOperation.getInstance().encryptPassword(newPassword), user.getUserRegisterTime(), newEmail, newMobile), (Customer) user);
-                    System.out.println("Profile updated successfully.");
+                case 5:
+                    Customer cus = IOInterface.updatedCustomer( user.getUserId(), scanner);
+                    cusOp.updateProfile(new Customer( user.getUserId(), cus.getUserName(), UserOperation.getInstance().encryptPassword(cus.getUserPassword()), user.getUserRegisterTime(), cus.getUserEmail(), cus.getUserMobile()), (Customer) user);
+                    IOInterface.successful();
                     break;
-                case "6":
-                    System.out.println("Are you sure you want to delete your account? (yes/no)");
-                    String confirm = scanner.nextLine();
-                    if (confirm.equalsIgnoreCase("yes")) {
+                case 6:
+                    if (IOInterface.confirmDeletetion(scanner)) {
                         cusOp.deleteCustomer(user.getUserId());
-                        System.out.println("Account deleted successfully.");
+                        IOInterface.successful();
                     } else {
-                        System.out.println("Account deletion canceled.");
+                        IOInterface.failed();
                     }
                     break;
                 
-                case "7":
-                    System.out.println("Logging out...");
+                case 7:
+                    IOInterface.exit();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    break;
             }
         } else if (user != null && user.getUserRole().equals("admin")) {
-            System.out.println("Admin not working yet.");
+            IOInterface.printError("Admin not working yet.");
         }
-         else {
-            System.out.println("Invalid username or password.");
+        else {
+            IOInterface.printError("Invalid username or password.");
         }
     }
 
@@ -141,16 +117,7 @@ public class MainControl {
 
     public static void register(Scanner scanner) {
         CustomerOperation cusOp = CustomerOperation.getInstance();
-        System.out.println("Enter username: ");
-        String username = scanner.next();
-        System.out.println("Enter password: ");
-        String password = scanner.next();
-        System.out.println("Enter email: ");
-        String email = scanner.next();
-        System.out.println("Enter mobile: ");
-        String mobile = scanner.next();
-
-        if (cusOp.registerCustomer(username, password, email, mobile)) {
+        if (cusOp.registerCustomer(IOInterface.printRegister(scanner))) {
             System.out.println("Registration successful!");
         } else {
             System.out.println("Registration failed. Please try again.");
