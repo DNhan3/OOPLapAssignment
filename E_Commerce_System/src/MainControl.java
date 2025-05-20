@@ -101,7 +101,7 @@ public class MainControl {
                     String newEmail = scanner.nextLine();
                     System.out.println("Enter new mobile:");
                     String newMobile = scanner.nextLine();
-                    cusOp.overwriteCustomer(new Customer(user.getUserId(), newUsername, newPassword, newEmail, newMobile));
+                    cusOp.updateProfile(newUsername, newPassword, null);
                     System.out.println("Profile updated successfully.");
                     break;
                 case "6":

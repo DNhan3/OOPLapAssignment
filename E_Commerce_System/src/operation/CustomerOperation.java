@@ -63,46 +63,33 @@ public class CustomerOperation {
         }
     }
 
-    public boolean updateProfile(String attributeName, String value, Customer customer) {
-        if (attributeName == null || value == null || customer == null) return false;
+    public boolean updateProfile(Customer newCustomer, Customer oldCustomer) {
+        if (newCustomer == null || oldCustomer == null) return false;
 
-        switch (attributeName) {
-            case "user_name":
-                if (!UserOperation.getInstance().validateUsername(value)) return false;
-                customer.setUserName(value);
-                break;
-            case "user_password":
-                if (!UserOperation.getInstance().validatePassword(value)) return false;
-                customer.setUserPassword(UserOperation.getInstance().encryptPassword(value));
-                break;
-            case "user_email":
-                if (!validateEmail(value)) return false;
-                customer.setUserEmail(value);
-                break;
-            case "user_mobile":
-                if (!validateMobile(value)) return false;
-                customer.setUserMobile(value);
-                break;
-            default:
-                return false;
-        }
+        newCustomer.setUserId(oldCustomer.getUserId());
 
-        return overwriteCustomer(customer);
+        return overwriteCustomer(newCustomer);
     }
 
     public boolean overwriteCustomer(Customer updatedCustomer) {
         try {
 
             List<User> users = ReadUserDB.read();
+            List<User> updated = new ArrayList<>();
 
             for (User user : users) {
                 if (user.getUserId().equals(updatedCustomer.getUserId())) {
-                    updated.add(updatedCustomer.toString());
+                    updated.add(updatedCustomer);
                 } else {
-                    updated.add(line);
+                    updated.add(user);
                 }
             }
-            Files.write(Paths.get(FILE_PATH), updated);
+
+            List<String> userStrings = new ArrayList<>();
+            for (User user : updated) {
+                userStrings.add(user.toString());
+            }
+            Files.write(Paths.get(FILE_PATH), userStrings);
             return true;
         } catch (IOException e) {
             System.out.println("Failed to update customer: " + e.getMessage());
