@@ -59,7 +59,7 @@ public class MainControl {
                         }
                         try {
                             page = Integer.parseInt(input);
-                            if (page < 1) {
+                            if (page < 1 || page > productOp.getProductPage()) {
                                 System.out.println("Invalid page number. Please try again.");
                             } else {
                                 productOp.getProductList(page).display();
@@ -110,6 +110,17 @@ public class MainControl {
                     System.out.println("Profile updated successfully.");
                     break;
                 case "6":
+                    System.out.println("Are you sure you want to delete your account? (yes/no)");
+                    String confirm = scanner.nextLine();
+                    if (confirm.equalsIgnoreCase("yes")) {
+                        cusOp.deleteCustomer(user.getUserId());
+                        System.out.println("Account deleted successfully.");
+                    } else {
+                        System.out.println("Account deletion canceled.");
+                    }
+                    break;
+                
+                case "7":
                     System.out.println("Logging out...");
                     break;
                 default:

@@ -99,9 +99,20 @@ public class CustomerOperation {
 
     public boolean deleteCustomer(String customerId) {
         try {
-            List<String> lines = Files.readAllLines(Paths.get(FILE_PATH));
-            lines.removeIf(line -> line.contains("\"user_id\":\"" + customerId + "\""));
-            Files.write(Paths.get(FILE_PATH), lines);
+            List<User> users = ReadUserDB.read();
+            List<User> updated = new ArrayList<>();
+
+            for (User user : users) {
+                if (!user.getUserId().equals(customerId)) {
+                    updated.add(user);
+                }
+            }
+
+            List<String> userStrings = new ArrayList<>();
+            for (User user : updated) {
+                userStrings.add(user.toString());
+            }
+            Files.write(Paths.get(FILE_PATH), userStrings);
             return true;
         } catch (IOException e) {
             System.out.println("Failed to delete customer: " + e.getMessage());
