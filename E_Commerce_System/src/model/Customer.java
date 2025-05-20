@@ -17,12 +17,6 @@ public class Customer extends User {
         this(userId, userName, userPassword, userRegisterTime, "customer", userEmail, userMobile);
     }
 
-    public Customer(String string, String newUsername, String newPassword, String newEmail, String newMobile) {
-        super();
-        this.userEmail = "default@example.com";
-        this.userMobile = "0412345678";
-    }
-
     @Override
     public String toString() {
         return "{\"user_id\":\""                + getUserId() +

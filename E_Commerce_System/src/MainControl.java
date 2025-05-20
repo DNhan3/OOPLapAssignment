@@ -83,7 +83,12 @@ public class MainControl {
                 case "3":
                     System.out.println("Enter product ID to place order:");
                     productId = scanner.nextLine();
-                    orderOp.placeOrder(user.getUserId(), productId);
+                    if(orderOp.placeOrder(user.getUserId(), productId)){
+                        System.out.println("Place order successfully.");
+                    }
+                    else{
+                        System.out.println("Place order failed.");
+                    }
                     break;
                 case "4":
                     System.out.println("Your orders:");
@@ -101,7 +106,7 @@ public class MainControl {
                     String newEmail = scanner.nextLine();
                     System.out.println("Enter new mobile:");
                     String newMobile = scanner.nextLine();
-                    cusOp.updateProfile(newUsername, newPassword, null);
+                    cusOp.updateProfile(new Customer( user.getUserId(), newUsername, UserOperation.getInstance().encryptPassword(newPassword), user.getUserRegisterTime(), newEmail, newMobile), (Customer) user);
                     System.out.println("Profile updated successfully.");
                     break;
                 case "6":

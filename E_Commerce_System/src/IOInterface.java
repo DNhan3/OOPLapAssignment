@@ -35,8 +35,7 @@ public class IOInterface {
         System.out.println("3. Place an order");
         System.out.println("4. View my orders");
         System.out.println("5. Update profile");
-        System.out.println("6. Delete my account");
-        System.out.println("7. Logout");
+        System.out.println("6. Logout");
         System.out.println("==============================");
         System.out.print("Enter your choice: ");
     }
